@@ -82,7 +82,8 @@ namespace SmartHealth.Controllers
 
             var disease = _context.Diseases
                 .Where(d => d.ID == id)
-                .Include(s => s.Specialty).FirstOrDefault();
+                .Include(s => s.Specialty)
+                .FirstOrDefault();
 
             if (disease == null)
             {

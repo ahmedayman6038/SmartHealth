@@ -85,11 +85,6 @@ namespace SmartHealth.ApiControllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSymptom([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var symptom = await _context.Symptoms.FindAsync(id);
 
             if (symptom == null)
@@ -101,11 +96,7 @@ namespace SmartHealth.ApiControllers
                 .Where(d => d.SymptomID == symptom.ID)
                 .ToList();
 
-            foreach (var disease in symptomDiseases)
-            {
-                _context.SymptomDiseases.Remove(disease);
-            }
-
+            _context.SymptomDiseases.RemoveRange(symptomDiseases);
             _context.Symptoms.Remove(symptom);
             await _context.SaveChangesAsync();
 

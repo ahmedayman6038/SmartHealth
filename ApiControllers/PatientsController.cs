@@ -83,11 +83,6 @@ namespace SmartHealth.ApiControllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePatient([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var patient = await _context.Patients.FindAsync(id);
 
             if (patient == null)

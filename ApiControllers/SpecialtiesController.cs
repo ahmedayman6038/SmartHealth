@@ -77,11 +77,6 @@ namespace SmartHealth.ApiControllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSpecialty([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var specialty = await _context.Specialties.FindAsync(id);
 
             if (specialty == null)
@@ -93,12 +88,7 @@ namespace SmartHealth.ApiControllers
                 .Where(s => s.SpecialtyID == specialty.ID)
                 .ToList();
 
-            foreach (var doctor in specialtyDoctors)
-            {
-                _context.SpecialtyDoctors.Remove(doctor);
-            }
-
-            _context.Specialties.Remove(specialty);
+            _context.SpecialtyDoctors.RemoveRange(specialtyDoctors);
             await _context.SaveChangesAsync();
 
             return Ok(specialty);
