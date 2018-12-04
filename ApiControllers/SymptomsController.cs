@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealth.Data;
 using SmartHealth.Models;
@@ -8,7 +9,7 @@ using SmartHealth.Models;
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController][Authorize]
     public class SymptomsController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -23,8 +24,7 @@ namespace SmartHealth.ApiControllers
         {
             return _context.Symptoms
                     .Where(s => s.Name.Contains(Name))
-                    .Select(s => s.Name)
-                    .ToList();
+                    .Select(s => s.Name).ToList();
         }
 
         [HttpPost]

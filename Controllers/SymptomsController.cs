@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
@@ -7,6 +8,7 @@ using SmartHealth.Models;
 
 namespace SmartHealth.Controllers
 {
+    [Authorize]
     public class SymptomsController : Controller
     {
         private readonly HealthContext _context;

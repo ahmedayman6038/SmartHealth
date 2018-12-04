@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
@@ -9,7 +10,7 @@ using SmartHealth.Models;
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController][Authorize]
     public class DoctorsController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -49,7 +50,6 @@ namespace SmartHealth.ApiControllers
 
             foreach (var id in Specialty)
             {
-                var specialty = _context.Specialties.Find(id);
                 var specialtyDoctor = new SpecialtyDoctor
                 {
                     DoctorID = doctor.ID,
@@ -96,7 +96,6 @@ namespace SmartHealth.ApiControllers
 
             foreach (var ids in Specialty)
             {
-                var specialty = _context.Specialties.Find(ids);
                 var specialtyDoctor = new SpecialtyDoctor
                 {
                     DoctorID = doctor.ID,

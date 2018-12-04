@@ -35,7 +35,13 @@ namespace SmartHealth.Controllers
             return View();
         }
 
-  
+        [Authorize]
+        public IActionResult Predict()
+        {
+
+            return View();
+        }
+
         [AllowAnonymous]
         public IActionResult Login(string returnUrl)
         {

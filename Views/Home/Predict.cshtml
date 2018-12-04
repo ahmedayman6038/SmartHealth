@@ -1,0 +1,208 @@
+﻿
+@{
+    ViewData["Title"] = "Predict";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Prediction
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">@ViewData["Title"]</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Predict Disease</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form id="myForm">
+                        <div class="box-body">
+                            <label for="SName">Enter symptom that's troubling you the most.</label>
+                            <div class="input-group input-group-sm">
+
+                                <input type="text" name="SName" id="SName" list="results" class="form-control">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-info btn-flat">Go!</button>
+                                </span>
+                            </div>
+                            <datalist id="results"></datalist>
+                            <p id="error" class="text-danger"></p>
+                        </div>
+                        <!-- /.box-body -->
+                    </form>
+                </div>
+                <!-- /.box -->
+
+            </div>
+            <!--/.col (left) -->
+
+        </div>
+        <!-- /.row-->
+        <!-- <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Predict Disease</h3>
+                        </div>
+                        <form id="myForm2">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label>Are you face any of these symptoms?</label>
+                                    <div class="radio icheck">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+                                            صداع
+                                        </label>
+                                    </div>
+                                    <div class="radio icheck">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                            الم فى الراس
+                                        </label>
+                                    </div>
+                                    <div class="radio icheck">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                            الم فى الراس
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box-footer">
+                                <button id="notFound" type="button" class="btn btn-success">Don't have any of these symptoms!</button>
+                                <button type="submit" class="btn btn-primary">Next</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    -->
+
+
+
+
+
+
+
+
+
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<div class="modal modal-success fade" id="modal-success">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Success</h4>
+            </div>
+            <div class="modal-body">
+                <p>Data saved successfully, Do you want add new item?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline" id="addNew">Add New</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal modal-danger fade" id="modal-danger">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Error</h4>
+            </div>
+            <div class="modal-body">
+                <p>This name already exist, Please add another one and try again!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline " data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        $(function () {
+            $("#SName").keyup(function () {
+                $("#results").empty();
+                $("#error").empty();
+                var sname = $('#SName').val();
+                $.ajax({
+                    url: '/api/Prediction?Name=' + sname,
+                    type: 'GET',
+                    dataType: 'json',
+                    error: function () {
+                        $('#modal-danger').modal('show');
+                    },
+                    success: function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            $("#results").append("<option>" + data[i] + "</option>");
+                        }
+                    },
+                });
+            });
+            $('#myForm').submit(function (e) {
+                e.preventDefault();
+                if ($("#SName").val()) {
+                    var sname = $('#SName').val();
+                    $.ajax({
+                        url: '/api/Prediction/Initialize?SName=' + sname,
+                        type: 'GET',
+                        dataType: 'json',
+                        error: function () {
+                            $('#modal-danger').modal('show');
+                        },
+                        success: function (data) {
+                            $("#myForm").remove();
+                            $(".box").append('<form id="myForm"><div class="box-body"><div class="form-group"><label>Are you face any of these symptoms?</label></div></div><div class="box-footer"><button style="margin-right: 5px;" id="notFound" type="button" class="btn btn-success">Dont have any of these symptoms!</button><button type="submit" class="btn btn-primary">Next</button></div></form>');
+                            for (var i = 0; i < data.length; i++) {
+                                $(".form-group").append('<div class="radio icheck"><label><input type="radio" name="Id" value="'+data[i].id+'">'+data[i].name+'</label></div>');
+                            }
+                            $('input').iCheck({
+                                checkboxClass: 'icheckbox_square-blue',
+                                radioClass: 'iradio_square-blue margin',
+                                increaseArea: '20%' /* optional */
+                            });
+                            $('.row').addClass('animated fadeInRight');
+                        },
+                    });
+                } else {
+                    $("#error").empty();
+                    $("#error").append("Please enter a symptom");
+                }
+            })
+        })
+    </script>
+}
+

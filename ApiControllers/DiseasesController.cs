@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
@@ -8,7 +10,7 @@ using SmartHealth.Models;
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController][Authorize]
     public class DiseasesController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -16,6 +18,14 @@ namespace SmartHealth.ApiControllers
         public DiseasesController(HealthContext context)
         {
             _context = context;
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<string>> GetDisease(string Name)
+        {
+            return _context.Diseases
+                    .Where(s => s.Name.Contains(Name))
+                    .Select(s => s.Name).ToList();
         }
 
         [HttpPost]
@@ -48,7 +58,6 @@ namespace SmartHealth.ApiControllers
 
             foreach (var id in Symptom)
             {
-                var symptom = _context.Symptoms.Find(id);
                 var symptomDiseases = new SymptomDisease
                 {
                     DiseaseID = disease.ID,
@@ -95,7 +104,6 @@ namespace SmartHealth.ApiControllers
 
             foreach (var ids in Symptom)
             {
-                var symptom = _context.Symptoms.Find(ids);
                 var symptomDisease = new SymptomDisease
                 {
                     DiseaseID = disease.ID,

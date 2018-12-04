@@ -1,8 +1,4 @@
 ﻿<!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
 <html>
 <head>
     <meta charset="utf-8">
@@ -19,12 +15,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="~/css/dataTables.bootstrap.min.css">
     <!-- Select2 -->
     <link rel="stylesheet" href="~/css/select2.min.css">
+    <!-- Animate -->
+    <link rel="stylesheet" href="~/css/animate.min.css">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="~/css/blue.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/css/AdminLTE.min.css">
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
           page. However, you can choose any other skin. Make sure you
           apply the skin class to the body tag so the changes take effect. -->
     <link rel="stylesheet" href="~/css/skin-blue.min.css">
+    <!-- Pace style -->
+    <link rel="stylesheet" href="~/css/pace.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -36,26 +38,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<!--
-BODY TAG OPTIONS:
-=================
-Apply one or more of the following classes to get the
-desired effect
-|---------------------------------------------------------|
-| SKINS         | skin-blue                               |
-|               | skin-black                              |
-|               | skin-purple                             |
-|               | skin-yellow                             |
-|               | skin-red                                |
-|               | skin-green                              |
-|---------------------------------------------------------|
-|LAYOUT OPTIONS | fixed                                   |
-|               | layout-boxed                            |
-|               | layout-top-nav                          |
-|               | sidebar-collapse                        |
-|               | sidebar-mini                            |
-|---------------------------------------------------------|
--->
 <body class="hold-transition skin-blue fixed">
     <div class="wrapper">
 
@@ -262,15 +244,17 @@ desired effect
                 <!-- /.search form -->
                 <!-- Sidebar Menu -->
                 @{
-                    var controller = ViewContext.RouteData.Values["Controller"].ToString().ToLower();
-                 }
+                    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+                    var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+                }
                 <ul class="sidebar-menu" data-widget="tree">
                     <li class="header">MAIN NAVIGATION</li>
                     <!-- Optionally, you can add icons to the links -->
-                    <li class="@(controller == "home" ? "active" : "")"><a asp-action="Index" asp-controller="Home"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+                    <li class="@((controller == "home" && action == "index") ? "active" : "")"><a asp-action="Index" asp-controller="Home"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
                     <li class="@(controller == "diseases" ? "active" : "")"><a asp-action="Index" asp-controller="Diseases"><i class="fa fa-shield"></i> <span>Diseases</span></a></li>
                     <li class="@(controller == "symptoms" ? "active" : "")"><a asp-action="Index" asp-controller="Symptoms"><i class="fa fa-th"></i> <span>Symptoms</span></a></li>
                     <li class="@(controller == "specialties" ? "active" : "")"><a asp-action="Index" asp-controller="Specialties"><i class="fa fa-list"></i> <span>Specialties</span></a></li>
+                    <li class="@((controller == "home" && action == "predict") ? "active" : "")"><a asp-action="Predict" asp-controller="Home"><i class="fa fa-medkit"></i> <span>Prediction</span></a></li>
                     <li class="header">USERS</li>
                     <li class="@(controller == "paitents" ? "active" : "")"><a asp-action="Index" asp-controller="Patients"><i class="fa fa-user"></i> <span>Patients</span></a></li>
                     <li class="@(controller == "doctors" ? "active" : "")"><a asp-action="Index" asp-controller="Doctors"><i class="fa fa-user-md"></i> <span>Doctors</span></a></li>
@@ -377,17 +361,23 @@ desired effect
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <!-- Bootstrap 3.3.7 -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <!-- PACE -->
+    <script src="~/js/pace.min.js"></script>
     <!-- DataTables -->
     <script src="~/js/jquery.dataTables.min.js"></script>
     <script src="~/js/dataTables.bootstrap.min.js"></script>
     <!-- Select2 -->
     <script src="~/js/select2.full.min.js"></script>
+    <!-- iCheck -->
+    <script src="~/js/icheck.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/js/adminlte.min.js"></script>
 
-    <!-- Optionally, you can add Slimscroll and FastClick plugins.
-         Both of these plugins are recommended to enhance the
-         user experience. -->
+    <script type="text/javascript">
+        $(document).ajaxStart(function () {
+            Pace.restart()
+        })
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>

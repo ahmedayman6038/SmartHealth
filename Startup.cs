@@ -41,8 +41,10 @@ namespace SmartHealth
                .AddCookie(options =>
                {
                    options.LoginPath = "/Home/Login";
-
                });
+
+            services.AddDistributedMemoryCache();
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +62,7 @@ namespace SmartHealth
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
             app.UseCookiePolicy();
             app.UseAuthentication();
 

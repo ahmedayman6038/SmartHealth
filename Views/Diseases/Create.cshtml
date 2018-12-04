@@ -35,9 +35,10 @@
                         <div class="box-body">
                             <div class="form-group">
                                 <label asp-for="Name"></label>
-                                <input asp-for="Name" class="form-control" placeholder="Name">
+                                <input asp-for="Name" list="results" class="form-control" placeholder="Name">
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
+                            <datalist id="results"></datalist>
                             <div class="form-group">
                                 <label asp-for="Details"></label>
                                 <textarea asp-for="Details" class="form-control" placeholder="Details" rows="3"></textarea>
@@ -84,7 +85,7 @@
                 <h4 class="modal-title">Success</h4>
             </div>
             <div class="modal-body">
-                <p>Data Saved Successfully Do you Want Add New Item? </p>
+                <p>Data saved successfully, Do you want add new item?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
@@ -107,7 +108,7 @@
                 <h4 class="modal-title">Error</h4>
             </div>
             <div class="modal-body">
-                <p>Something Goes Wrong On The Server Pleas Try Again!</p>
+                <p>This name already exist, Please add another one and try again!</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline " data-dismiss="modal">Ok</button>
@@ -122,18 +123,36 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(function () {
-            //Initialize Select2 Elements
+            $("#Name").keyup(function () {
+                $("#results").empty();
+                var name = $('#Name').val();
+                $.ajax({
+                    url: '/api/Diseases?Name=' + name,
+                    type: 'GET',
+                    dataType: 'json',
+                    error: function () {
+                        $('#modal-danger').modal('show');
+                    },
+                    success: function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            $("#results").append("<option>" + data[i] + "</option>");
+                        }
+                    },
+                });
+            });
             $('#Type').select2();
             var $select = $('#Symptoms').select2();
             $('#addNew').click(function () {
                 $('#Name').val("").focus();
                 $('#Details').val("");
+                $("#results").empty();
                 $select.val(null).trigger("change");
                 $('#modal-success').modal('hide');
             })
             $('#resetData').click(function () {
                 $('#Name').val("").focus();
                 $('#Details').val("");
+                $("#results").empty();
                 $select.val(null).trigger("change");
             })
             $('#myForm').submit(function (e) {

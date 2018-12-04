@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealth.Data;
 using SmartHealth.Models;
@@ -7,7 +9,7 @@ using SmartHealth.Models;
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController][Authorize]
     public class SpecialtiesController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -15,6 +17,14 @@ namespace SmartHealth.ApiControllers
         public SpecialtiesController(HealthContext context)
         {
             _context = context;
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<string>> GetSpecialty(string Name)
+        {
+            return _context.Specialties
+                    .Where(s => s.Name.Contains(Name))
+                    .Select(s => s.Name).ToList();
         }
 
         [HttpPost]
@@ -89,6 +99,7 @@ namespace SmartHealth.ApiControllers
                 .ToList();
 
             _context.SpecialtyDoctors.RemoveRange(specialtyDoctors);
+            _context.Specialties.Remove(specialty);
             await _context.SaveChangesAsync();
 
             return Ok(specialty);

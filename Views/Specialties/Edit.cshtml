@@ -36,9 +36,10 @@
                             <input type="hidden" asp-for="ID" />
                             <div class="form-group">
                                 <label asp-for="Name"></label>
-                                <input asp-for="Name" class="form-control" placeholder="Name">
+                                <input asp-for="Name" list="results" class="form-control" placeholder="Name">
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
+                            <datalist id="results"></datalist>
                             <div class="form-group">
                                 <label asp-for="Details"></label>
                                 <input asp-for="Details" class="form-control" placeholder="Details">
@@ -75,7 +76,7 @@
                 <h4 class="modal-title">Success</h4>
             </div>
             <div class="modal-body">
-                <p>Data Updated Successfully!</p>
+                <p>Data updated successfully!</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
@@ -97,7 +98,7 @@
                 <h4 class="modal-title">Error</h4>
             </div>
             <div class="modal-body">
-                <p>Something Goes Wrong On The Server Pleas Try Again!</p>
+                <p>This name already exist, Please add another one and try again!</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline " data-dismiss="modal">Ok</button>
@@ -112,9 +113,27 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(function () {
+            $("#Name").keyup(function () {
+                $("#results").empty();
+                var name = $('#Name').val();
+                $.ajax({
+                    url: '/api/Specialties?Name=' + name,
+                    type: 'GET',
+                    dataType: 'json',
+                    error: function () {
+                        $('#modal-danger').modal('show');
+                    },
+                    success: function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            $("#results").append("<option>" + data[i] + "</option>");
+                        }
+                    },
+                });
+            });
             $('#resetData').click(function () {
                 $('#Name').val("").focus();
                 $('#Details').val("");
+                $("#results").empty();
             })
             $('#myForm').submit(function (e) {
                 if ($("#myForm").valid()) {

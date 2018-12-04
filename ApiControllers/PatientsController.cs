@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartHealth.Data;
 using SmartHealth.Helper;
@@ -8,7 +9,7 @@ using SmartHealth.Models;
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController][Authorize]
     public class PatientsController : ControllerBase
     {
         private readonly HealthContext _context;
