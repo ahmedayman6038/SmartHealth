@@ -86,7 +86,7 @@ namespace SmartHealth.ApiControllers
                 .Where(d => d.Name == Name)
                 .FirstOrDefault();
 
-            if (disease == null || type == null || check.ID != disease.ID)
+            if (disease == null || type == null || (check != null && check.ID != disease.ID))
             {
                 return BadRequest();
             }

@@ -78,7 +78,7 @@ namespace SmartHealth.ApiControllers
                 .Where(u => u.Password == hasedPassword)
                 .FirstOrDefault();
 
-            if (doctor == null || user.ID != doctor.ID)
+            if (doctor == null || (user != null && user.ID != doctor.ID))
             {
                 return BadRequest();
             }
