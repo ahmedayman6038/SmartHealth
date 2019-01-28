@@ -113,23 +113,11 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(function () {
-            $("#Name").keyup(function () {
+            $('#Name').keyup(delay(function (e) {
                 $("#results").empty();
                 var name = $('#Name').val();
-                $.ajax({
-                    url: '/api/Specialties?Name=' + name,
-                    type: 'GET',
-                    dataType: 'json',
-                    error: function () {
-                        $('#modal-danger').modal('show');
-                    },
-                    success: function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            $("#results").append("<option>" + data[i] + "</option>");
-                        }
-                    },
-                });
-            });
+                searchSpecialty(name);
+            }, 500));
             $('#resetData').click(function () {
                 $('#Name').val("").focus();
                 $('#Details').val("");
@@ -141,17 +129,7 @@
                     var name = $('#Name').val();
                     var details = $('#Details').val();
                     var id = $('#ID').val();
-                    $.ajax({
-                        url: '/api/Specialties/' + id + '?Name=' + name + '&Details=' + details,
-                        type: 'PUT',
-                        dataType: 'json',
-                        error: function () {
-                            $('#modal-danger').modal('show');
-                        },
-                        success: function () {
-                            $('#modal-success').modal('show');
-                        },
-                    });
+                    updateSpecialty(id, name, details);
                 }               
             })
         })

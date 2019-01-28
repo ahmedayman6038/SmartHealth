@@ -135,17 +135,7 @@
                     var name = $('#Name').val();
                     var password = $('#Password').val();
                     var email = $('#Email').val();
-                    $.ajax({
-                        url: '/api/Patients?Name=' + name + '&Email=' + email + '&Password=' + password,
-                        type: 'POST',
-                        dataType: 'json',
-                        error: function () {
-                            $('#modal-danger').modal('show');
-                        },
-                        success: function () {
-                            $('#modal-success').modal('show');
-                        },
-                    });
+                    addPatient(name, email, password);
                 }
               
             })

@@ -148,17 +148,7 @@
                     for (var i = 0; i < specialty.length; i++) {
                         send += "Specialty=" + specialty[i] + "&";
                     }
-                    $.ajax({
-                        url: '/api/Doctors/' + id + '?' + send + 'Name=' + name + '&Email=' + email + '&Password=' + password,
-                        type: 'PUT',
-                        dataType: 'json',
-                        error: function () {
-                            $('#modal-danger').modal('show');
-                        },
-                        success: function () {
-                            $('#modal-success').modal('show');
-                        },
-                    });
+                    updateDoctor(id, send, name, email, password);
                 }
             })
         })

@@ -115,24 +115,14 @@
 @section Scripts {
     <script>
         $(function () {
-            var table = $('#example1').DataTable()
+            $('#example1').DataTable();
             var id = 0;
             $('.delete').click(function () {
                 $('#modal-warning').modal('show');
                 id = $(this).attr('id');
             })
             $('#confirmDelete').click(function () {
-                $.ajax({
-                    url: '/api/Specialties/' + id,
-                    type: 'DELETE',
-                    dataType: 'json',
-                    error: function () {
-                        $('#modal-danger').modal('show');
-                    },
-                    success: function () {
-                        table.row("#" + id).remove().draw();
-                    },
-                });
+                deleteSpecialty(id);
                 $('#modal-warning').modal('hide');
             })
         })

@@ -123,23 +123,11 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(function () {
-            $("#Name").keyup(function () {
+            $('#Name').keyup(delay(function (e) {
                 $("#results").empty();
                 var name = $('#Name').val();
-                $.ajax({
-                    url: '/api/Diseases?Name=' + name,
-                    type: 'GET',
-                    dataType: 'json',
-                    error: function () {
-                        $('#modal-danger').modal('show');
-                    },
-                    success: function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            $("#results").append("<option>" + data[i] + "</option>");
-                        }
-                    },
-                });
-            });
+                searchDisease(name);
+            }, 500));
             $('#Type').select2();
             var $select = $('#Symptoms').select2();
             $('#addNew').click(function () {
@@ -167,17 +155,7 @@
                     for (var i = 0; i < symptoms.length; i++) {
                         send += "Symptom=" + symptoms[i] + "&";
                     }
-                    $.ajax({
-                        url: '/api/Diseases?' + send + 'Name=' + name + '&Details=' + details + '&Type=' + type,
-                        type: 'POST',
-                        dataType: 'json',
-                        error: function () {
-                            $('#modal-danger').modal('show');
-                        },
-                        success: function () {
-                            $('#modal-success').modal('show');
-                        },
-                    });
+                    addDisease(send, name, details, type);
                 }
             })
         })

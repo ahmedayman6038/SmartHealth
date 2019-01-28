@@ -21,7 +21,7 @@ namespace SmartHealth.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Diseases.Include(s => s.SymptomDiseases).ToListAsync());
+            return View(await _context.Diseases.Include(s => s.SymptomDiseases).Include(s => s.Specialty).ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)

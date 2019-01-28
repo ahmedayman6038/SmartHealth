@@ -129,17 +129,7 @@
                     var email = $('#Email').val();
                     var password = $('#Password').val();
                     var id = $('#ID').val();
-                    $.ajax({
-                        url: '/api/Patients/' + id + '?Name=' + name + '&Email=' + email + '&Password=' + password,
-                        type: 'PUT',
-                        dataType: 'json',
-                        error: function () {
-                            $('#modal-danger').modal('show');
-                        },
-                        success: function () {
-                            $('#modal-success').modal('show');
-                        },
-                    });
+                    updatePatient(id, name, email, password);
                 }
             })
         })

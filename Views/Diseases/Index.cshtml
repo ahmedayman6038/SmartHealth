@@ -33,6 +33,7 @@
                             <thead>
                                 <tr>
                                     <th>@Html.DisplayNameFor(model => model.Name)</th>
+                                    <th>Type</th>
                                     <th>Reference Symptom Count</th>
                                     <th>Operations</th>
                                 </tr>
@@ -42,6 +43,7 @@
                                 {
                                     <tr id="@item.ID">
                                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Specialty.Name)</td>
                                         <td>@Html.DisplayFor(modelItem => item.SymptomDiseases.Count)</td>
                                         <td>
                                             <a asp-action="Details" asp-controller="Diseases" asp-route-id="@item.ID" class="btn btn-social-icon btn-bitbucket" style="background-color: #3c8dbc"><i class="fa fa-info-circle"></i></a>
@@ -114,24 +116,14 @@
 @section Scripts {
     <script>
         $(function () {
-            var table = $('#example1').DataTable()
+            $('#example1').DataTable();
             var id = 0;
             $('.delete').click(function () {
                 $('#modal-warning').modal('show');
                 id = $(this).attr('id');
             })
             $('#confirmDelete').click(function () {
-                $.ajax({
-                    url: '/api/Diseases/' + id,
-                    type: 'DELETE',
-                    dataType: 'json',
-                    error: function () {
-                        $('#modal-danger').modal('show');
-                    },
-                    success: function () {
-                        table.row("#" + id).remove().draw();
-                    },
-                });
+                deleteDisease(id);
                 $('#modal-warning').modal('hide');
             })
         })
