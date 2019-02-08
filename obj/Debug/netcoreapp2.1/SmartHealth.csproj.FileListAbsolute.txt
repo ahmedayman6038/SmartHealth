@@ -52,3 +52,7 @@ E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Ad
 E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Admins\Edit.g.cshtml.cs
 E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Admins\Index.g.cshtml.cs
 E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Home\Predict.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Feedbacks\Index.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Feedbacks\Details.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Feedbacks\Create.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Debug\netcoreapp2.1\Razor\Views\Feedbacks\Reply.g.cshtml.cs

@@ -30,39 +30,21 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
-            var doctor = await _context.Doctors.FindAsync(id);
-
+            var doctor = await _context.Doctors
+                .Where(d => d.ID == id)
+                .Include(s => s.SpecialtyDoctors)
+                .ThenInclude(s => s.Specialty)
+                .FirstOrDefaultAsync();
             if (doctor == null)
             {
                 return NotFound();
             }
-
-            var specialtyDoctors = _context.SpecialtyDoctors
-               .Where(d => d.DoctorID == doctor.ID)
-               .Include(s => s.Specialty).ToList();
-
-            if (specialtyDoctors.Count == 0)
-            {
-                specialtyDoctors.Add(new SpecialtyDoctor
-                {
-                    Specialty = new Specialty(),
-                    Doctor = doctor
-                });
-            }
-
-            return View(specialtyDoctors);
+            return View(doctor);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["Specialty"] = _context.Specialties
-               .Select(n => new SelectListItem
-               {
-                   Value = n.ID.ToString(),
-                   Text = n.Name
-               }).ToList();
-
+            await FillSelectListAsync();
             return View();
         }
 
@@ -72,26 +54,27 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
             var doctor = await _context.Doctors.FindAsync(id);
-
             if (doctor == null)
             {
                 return NotFound();
             }
-
-            ViewData["Specialty"] = _context.Specialties
-              .Select(n => new SelectListItem
-              {
-                  Value = n.ID.ToString(),
-                  Text = n.Name
-              }).ToList();
-
-            ViewData["SpecialtyDoctor"] = _context.SpecialtyDoctors
+            await FillSelectListAsync();
+            ViewData["SpecialtyDoctor"] = await _context.SpecialtyDoctors
                 .Where(d => d.DoctorID == doctor.ID)
-                .Select(s => s.SpecialtyID).ToList();
-
+                .Select(s => s.SpecialtyID)
+                .ToListAsync();
             return View(doctor);
+        }
+
+        private async Task FillSelectListAsync()
+        {
+            ViewData["Specialty"] = await _context.Specialties
+                .Select(n => new SelectListItem
+                {
+                    Value = n.ID.ToString(),
+                    Text = n.Name
+                }).ToListAsync();
         }
     }
 }

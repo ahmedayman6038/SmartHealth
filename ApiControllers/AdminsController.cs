@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
 using SmartHealth.Helper;
 using SmartHealth.Models;
@@ -9,7 +10,7 @@ using SmartHealth.Models;
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController][Authorize]
+    [ApiController]
     public class AdminsController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -20,80 +21,60 @@ namespace SmartHealth.ApiControllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostPatient(string Name, string Email, string Password)
+        public async Task<IActionResult> PostAdmin(Admin admin)
         {
-            if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Password))
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-
-            var hasedPassword = Encrypt.EncryptString(Password);
-
-            var user = _context.Admins
-                .Where(u => u.Password == hasedPassword)
-                .FirstOrDefault();
-
+            var hasedPassword = Encrypt.EncryptString(admin.Password);
+            var user = await _context.Admins
+                .Where(u => u.Password == hasedPassword || u.Email == admin.Email)
+                .FirstOrDefaultAsync();
             if (user != null)
             {
                 return BadRequest();
             }
-
-            var admin = new Admin
-            {
-                Name = Name,
-                Email = Email,
-                Password = hasedPassword
-            };
-
-            _context.Admins.Add(admin);
+            admin.Password = hasedPassword;
+            await _context.Admins.AddAsync(admin);
             await _context.SaveChangesAsync();
-
             return Ok(admin);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPatient([FromRoute] int id, string Name, string Email, string Password)
+        public async Task<IActionResult> PutAdmin(int id, Admin item)
         {
-            if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Password))
+            if (!ModelState.IsValid || id != item.ID)
             {
                 return BadRequest();
             }
-
             var admin = await _context.Admins.FindAsync(id);
-            var hasedPassword = Encrypt.EncryptString(Password);
-
-            var user = _context.Admins
-                .Where(u => u.Password == hasedPassword)
-                .FirstOrDefault();
-
-            if (admin == null || (user != null && user.ID != admin.ID))
+            var hasedPassword = Encrypt.EncryptString(item.Password);
+            var user = await _context.Admins
+                .Where(u => u.Password == hasedPassword || u.Email == item.Email)
+                .FirstOrDefaultAsync();
+            if (user != null && user.ID != item.ID)
             {
                 return BadRequest();
             }
-
-            admin.Name = Name;
-            admin.Email = Email;
+            admin.Name = item.Name;
+            admin.Email = item.Email;
             admin.Password = hasedPassword;
-
             _context.Admins.Update(admin);
             await _context.SaveChangesAsync();
-
             return Ok(admin);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePatient([FromRoute] int id)
+        public async Task<IActionResult> DeleteAdmin(int id)
         {
             var admin = await _context.Admins.FindAsync(id);
-
             if (admin == null)
             {
                 return NotFound();
             }
-
             _context.Admins.Remove(admin);
             await _context.SaveChangesAsync();
-
             return Ok(admin);
         }
     }

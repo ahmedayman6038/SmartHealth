@@ -3,13 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
 using SmartHealth.Models;
 
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController][Authorize]
+    [ApiController]
     public class SpecialtiesController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -19,89 +20,77 @@ namespace SmartHealth.ApiControllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> GetSpecialty(string Name)
+        [HttpGet("list")]
+        public async Task<IEnumerable<Specialty>> GetAllSpecialty()
         {
-            return _context.Specialties
+            return await _context.Specialties
+                    .ToListAsync();
+        }
+
+        [HttpGet]
+        public async Task<IEnumerable<string>> GetSpecialty(string Name)
+        {
+            return await _context.Specialties
                     .Where(s => s.Name.Contains(Name))
-                    .Select(s => s.Name).ToList();
+                    .Select(s => s.Name)
+                    .ToListAsync();
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostSpecialty(string Name, string Details)
+        public async Task<IActionResult> PostSpecialty(Specialty specialty)
         {
-            if (string.IsNullOrWhiteSpace(Name))
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-
-            var check = _context.Specialties
-                .Where(d => d.Name == Name)
-                .FirstOrDefault();
-
+            var check = await _context.Specialties
+                        .Where(d => d.Name == specialty.Name)
+                        .FirstOrDefaultAsync();
             if (check != null)
             {
                 return BadRequest();
             }
-
-            var specialty = new Specialty
-            {
-                Name = Name,
-                Details = Details
-            };
-
-            _context.Specialties.Add(specialty);
+            await _context.Specialties.AddAsync(specialty);
             await _context.SaveChangesAsync();
-
             return Ok(specialty);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSpecialty([FromRoute] int id, string Name, string Details)
+        public async Task<IActionResult> PutSpecialty(int id, Specialty item)
         {
-            if (string.IsNullOrWhiteSpace(Name))
+            if (!ModelState.IsValid || id != item.ID)
             {
                 return BadRequest();
             }
-
             var specialty = await _context.Specialties.FindAsync(id);
-
-            var check = _context.Specialties
-                .Where(d => d.Name == Name)
-                .FirstOrDefault();
-
+            var check = await _context.Specialties
+                        .Where(d => d.Name == specialty.Name)
+                        .FirstOrDefaultAsync();
             if (specialty == null || (check != null && check.ID != specialty.ID))
             {
                 return BadRequest();
             }
-
-            specialty.Name = Name;
-            specialty.Details = Details;
-
+            specialty.Name = item.Name;
+            specialty.Details = item.Details;
             _context.Specialties.Update(specialty);
             await _context.SaveChangesAsync();
-
             return Ok(specialty);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSpecialty([FromRoute] int id)
+        public async Task<IActionResult> DeleteSpecialty(int id)
         {
             var specialty = await _context.Specialties.FindAsync(id);
-
             if (specialty == null)
             {
                 return NotFound();
             }
-
-            var specialtyDoctors = _context.SpecialtyDoctors
-                .Where(s => s.SpecialtyID == specialty.ID)
-                .ToList();
-
+            var specialtyDoctors = await _context.SpecialtyDoctors
+                                   .Where(s => s.SpecialtyID == specialty.ID)
+                                   .ToListAsync();
             _context.SpecialtyDoctors.RemoveRange(specialtyDoctors);
             _context.Specialties.Remove(specialty);
             await _context.SaveChangesAsync();
-
             return Ok(specialty);
         }
     }

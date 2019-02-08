@@ -20,7 +20,9 @@ namespace SmartHealth.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Specialties.Include(s => s.SpecialtyDoctors).ToListAsync());
+            return View(await _context.Specialties
+                .Include(s => s.SpecialtyDoctors)
+                .ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -29,28 +31,16 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
-            var specialty = await _context.Specialties.FindAsync(id);
-
+            var specialty = await _context.Specialties
+                .Where(s => s.ID == id)
+                .Include(s => s.SpecialtyDoctors)
+                .ThenInclude(s => s.Doctor)
+                .FirstOrDefaultAsync();
             if (specialty == null)
             {
                 return NotFound();
             }
-
-            var specialtyDoctors = _context.SpecialtyDoctors
-                .Where(s => s.SpecialtyID == specialty.ID)
-                .Include(d => d.Doctor).ToList();
-
-            if (specialtyDoctors.Count == 0)
-            {
-                specialtyDoctors.Add(new SpecialtyDoctor
-                {
-                    Specialty = specialty,
-                    Doctor = new Doctor()
-                });
-            }
-
-            return View(specialtyDoctors);
+            return View(specialty);
         }
 
         public IActionResult Create()
@@ -64,14 +54,11 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
             var specialty = await _context.Specialties.FindAsync(id);
-
             if (specialty == null)
             {
                 return NotFound();
             }
-
             return View(specialty);
         }
     }

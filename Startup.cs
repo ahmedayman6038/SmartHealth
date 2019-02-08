@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartHealth.Data;
+using SmartHealth.Helper;
+using System.Net;
+using System.Net.Mail;
 
 namespace SmartHealth
 {
@@ -42,6 +45,21 @@ namespace SmartHealth
                {
                    options.LoginPath = "/Home/Login";
                });
+
+            services.AddTransient<SmtpClient>((serviceProvider) =>
+            {
+                var config = serviceProvider.GetRequiredService<IConfiguration>();
+                return new SmtpClient()
+                {
+                    Host = config.GetValue<string>("Email:Smtp:Host"),
+                    Port = config.GetValue<int>("Email:Smtp:Port"),
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(
+                            config.GetValue<string>("Email:Smtp:Username"),
+                            config.GetValue<string>("Email:Smtp:Password")
+                        )
+                };
+            });
 
             services.AddDistributedMemoryCache();
             services.AddSession();

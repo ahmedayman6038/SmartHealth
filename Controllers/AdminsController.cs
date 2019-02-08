@@ -27,14 +27,11 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
             var admin = await _context.Admins.FindAsync(id);
-
             if (admin == null)
             {
                 return NotFound();
             }
-
             return View(admin);
         }
 
@@ -49,14 +46,11 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
             var admin = await _context.Admins.FindAsync(id);
-
             if (admin == null)
             {
                 return NotFound();
             }
-
             return View(admin);
         }
     }

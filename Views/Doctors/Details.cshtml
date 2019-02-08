@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SmartHealth.Models.SpecialtyDoctor>
+﻿@model SmartHealth.Models.Doctor
 
 @{
     ViewData["Title"] = "Details";
@@ -34,19 +34,19 @@
                     <div class="box-body">
                         <dl class="dl-horizontal">
                             <dt>ٍDoctor Name</dt>
-                            <dd>@Model.First().Doctor.Name</dd>
+                            <dd>@Model.Name</dd>
                             <dt>ٍDoctor Email</dt>
-                            <dd>@Model.First().Doctor.Email</dd>
+                            <dd>@Model.Email</dd>
                             <dt>ٍDoctor City</dt>
-                            <dd>@Model.First().Doctor.City</dd>
+                            <dd>@Model.City</dd>
                             <dt>ٍDoctor Address</dt>
-                            <dd>@Model.First().Doctor.Address</dd>
+                            <dd>@Model.Address</dd>
                             <dt>ٍDoctor Created</dt>
-                            <dd>@Model.First().Doctor.CreatedData.ToString("dd/MM/yyyy")</dd>
+                            <dd>@Model.CreatedData.ToString("dd/MM/yyyy")</dd>
                             <dt>Doctor Specialties</dt>
                             <dd>
                                 <ul>
-                                    @foreach (var item in Model)
+                                    @foreach (var item in Model.SpecialtyDoctors)
                                     {
                                         <li>@item.Specialty.Name</li>
                                     }

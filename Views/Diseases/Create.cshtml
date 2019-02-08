@@ -151,11 +151,7 @@
                     var type = $('#Type').val();
                     var symptoms = new Array();
                     symptoms = $("#Symptoms").val();
-                    var send = "";
-                    for (var i = 0; i < symptoms.length; i++) {
-                        send += "Symptom=" + symptoms[i] + "&";
-                    }
-                    addDisease(send, name, details, type);
+                    addDisease(symptoms, name, details, type);
                 }
             })
         })

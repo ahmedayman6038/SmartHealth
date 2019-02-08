@@ -115,14 +115,14 @@
 @section Scripts {
     <script>
         $(function () {
-            $('#example1').DataTable();
+            var table = $('#example1').DataTable();
             var id = 0;
             $('.delete').click(function () {
                 $('#modal-warning').modal('show');
                 id = $(this).attr('id');
             })
             $('#confirmDelete').click(function () {
-                deleteSpecialty(id);
+                deleteSpecialty(id,table);
                 $('#modal-warning').modal('hide');
             })
         })

@@ -20,7 +20,9 @@ namespace SmartHealth.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Symptoms.Include(s => s.SymptomDiseases).ToListAsync());
+            return View(await _context.Symptoms
+                .Include(s => s.SymptomDiseases)
+                .ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -29,28 +31,16 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
-            var symptom = await _context.Symptoms.FindAsync(id);
-
+            var symptom = await _context.Symptoms
+                .Where(s => s.ID == id)
+                .Include(s => s.SymptomDiseases)
+                .ThenInclude(s => s.Disease)
+                .FirstOrDefaultAsync();
             if (symptom == null)
             {
                 return NotFound();
             }
-
-            var symptomDisease = _context.SymptomDiseases
-                .Where(d => d.SymptomID == symptom.ID)
-                .Include(d => d.Disease).ToList();
-
-            if(symptomDisease.Count == 0)
-            {
-                symptomDisease.Add(new SymptomDisease
-                {
-                    Symptom = symptom,
-                    Disease = new Disease()
-                });
-            }
-
-            return View(symptomDisease);
+            return View(symptom);
         }
 
         public IActionResult Create()
@@ -64,14 +54,11 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
             var symptom = await _context.Symptoms.FindAsync(id);
-
             if (symptom == null)
             {
                 return NotFound();
             }
-
             return View(symptom);
         }
     }

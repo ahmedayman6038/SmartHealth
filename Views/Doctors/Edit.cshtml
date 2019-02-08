@@ -144,11 +144,7 @@
                     var id = $('#ID').val();
                     var specialty = new Array();
                     specialty = $("#Specialty").val();
-                    var send = "";
-                    for (var i = 0; i < specialty.length; i++) {
-                        send += "Specialty=" + specialty[i] + "&";
-                    }
-                    updateDoctor(id, send, name, email, password);
+                    updateDoctor(id, specialty, name, email, password);
                 }
             })
         })

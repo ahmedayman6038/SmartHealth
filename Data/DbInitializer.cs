@@ -7,7 +7,7 @@ namespace SmartHealth.Data
 {
     public static class DbInitializer
     {
-      
+       
         public static void Initialize(HealthContext context, IConfiguration configuration)
         {
             context.Database.EnsureCreated();
@@ -19,10 +19,12 @@ namespace SmartHealth.Data
 
             var name = configuration["MyConfig:AdminName"];
             var password = configuration["MyConfig:AdminPassword"];
+            var email = configuration["MyConfig:AdminEmail"];
 
             var admin = new Admin
             {
                 Name = name,
+                Email = email,
                 Password = Encrypt.EncryptString(password),
             };
 

@@ -40,9 +40,9 @@
 
             <form asp-controller="Home" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                 <div class="form-group has-feedback">
-                    <input asp-for="Name" class="form-control" placeholder="Name">
+                    <input asp-for="Email" class="form-control" placeholder="Email">
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="form-group has-feedback">
                     <input asp-for="Password" class="form-control" placeholder="Password">

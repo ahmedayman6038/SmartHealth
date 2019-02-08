@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
-using SmartHealth.Models;
 
 namespace SmartHealth.Controllers
 {
@@ -21,7 +20,10 @@ namespace SmartHealth.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Diseases.Include(s => s.SymptomDiseases).Include(s => s.Specialty).ToListAsync());
+            return View(await _context.Diseases
+                .Include(s => s.SymptomDiseases)
+                .Include(s => s.Specialty)
+                .ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -30,87 +32,61 @@ namespace SmartHealth.Controllers
             {
                 return NotFound();
             }
-
-            var disease = await _context.Diseases.FindAsync(id);
-
+            var disease = await _context.Diseases
+                .Where(d => d.ID == id)
+                .Include(d => d.Specialty)
+                .Include(d => d.SymptomDiseases)
+                .ThenInclude(d => d.Symptom)
+                .FirstOrDefaultAsync();
             if (disease == null)
             {
                 return NotFound();
             }
-
-            var symptomDisease = _context.SymptomDiseases
-                .Where(d => d.DiseaseID == disease.ID)
-                .Include(s => s.Symptom)
-                .Include(s => s.Disease.Specialty)
-                .ToList();
-
-            if (symptomDisease.Count == 0)
-            {
-                symptomDisease.Add(new SymptomDisease
-                {
-                    Disease = disease,
-                    Symptom = new Symptom()
-                });
-            }
-
-            return View(symptomDisease);
+            return View(disease);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["Symptoms"] = _context.Symptoms
-                .Select(n => new SelectListItem
-                {
-                    Value = n.ID.ToString(),
-                    Text = n.Name
-                }).ToList();
-
-            ViewData["Type"] = _context.Specialties
-                .Select(n => new SelectListItem
-                {
-                    Value = n.ID.ToString(),
-                    Text = n.Name
-                }).ToList();
-
+            await FillSelectListAsync();
             return View();
         }
 
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var disease = _context.Diseases
+            var disease = await _context.Diseases
                 .Where(d => d.ID == id)
                 .Include(s => s.Specialty)
-                .FirstOrDefault();
-
+                .FirstOrDefaultAsync();
             if (disease == null)
             {
                 return NotFound();
             }
-
-            ViewData["Symptoms"] = _context.Symptoms
-                .Select(n => new SelectListItem
-                {
-                    Value = n.ID.ToString(),
-                    Text = n.Name
-                }).ToList();
-
-            ViewData["Type"] = _context.Specialties
-                .Select(n => new SelectListItem
-                {
-                    Value = n.ID.ToString(),
-                    Text = n.Name
-                }).ToList();
-
-            ViewData["DiseaseSymptoms"] = _context.SymptomDiseases
+            await FillSelectListAsync();
+            ViewData["DiseaseSymptoms"] = await _context.SymptomDiseases
                 .Where(d => d.DiseaseID == disease.ID)
-                .Select(s => s.SymptomID).ToList();
-
+                .Select(s => s.SymptomID)
+                .ToListAsync();
             return View(disease);
+        }
+
+        private async Task FillSelectListAsync()
+        {
+            ViewData["Symptoms"] = await _context.Symptoms
+                .Select(n => new SelectListItem
+                {
+                    Value = n.ID.ToString(),
+                    Text = n.Name
+                }).ToListAsync();
+            ViewData["Type"] = await _context.Specialties
+                .Select(n => new SelectListItem
+                {
+                    Value = n.ID.ToString(),
+                    Text = n.Name
+                }).ToListAsync();
         }
     }
 }

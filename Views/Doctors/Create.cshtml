@@ -145,11 +145,7 @@
                     var email = $('#Email').val();
                     var specialty = new Array();
                     specialty = $("#Specialty").val();
-                    var send = "";
-                    for (var i = 0; i < specialty.length; i++) {
-                        send += "Specialty=" + specialty[i] + "&";
-                    }
-                    addDoctor(send, name, email, password);
+                    addDoctor(specialty, name, email, password);
                 }
             })
         })

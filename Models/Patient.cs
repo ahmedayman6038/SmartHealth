@@ -11,6 +11,6 @@ namespace SmartHealth.Models
         public string Gender { get; set; }
         public int Weight { get; set; }
         public int Height { get; set; }
-        public ICollection<Rating> Ratings { get; set; }
+        public ICollection<DoctorRating> DoctorRatings { get; set; }
     }
 }

@@ -27,7 +27,10 @@
     <link rel="stylesheet" href="~/css/skin-blue.min.css">
     <!-- Pace style -->
     <link rel="stylesheet" href="~/css/pace.min.css">
-
+    <!-- bootstrap wysihtml5 - text editor -->
+    <link href="~/lib/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css" rel="stylesheet" />
+    <!-- My Style -->
+    <link href="~/css/site.css" rel="stylesheet" />
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -254,6 +257,7 @@
                     <li class="@(controller == "diseases" ? "active" : "")"><a asp-action="Index" asp-controller="Diseases"><i class="fa fa-shield"></i> <span>Diseases</span></a></li>
                     <li class="@(controller == "symptoms" ? "active" : "")"><a asp-action="Index" asp-controller="Symptoms"><i class="fa fa-th"></i> <span>Symptoms</span></a></li>
                     <li class="@(controller == "specialties" ? "active" : "")"><a asp-action="Index" asp-controller="Specialties"><i class="fa fa-list"></i> <span>Specialties</span></a></li>
+                    <li class="@(controller == "feedbacks" ? "active" : "")"><a asp-action="Index" asp-controller="Feedbacks"><i class="fa fa-comments"></i> <span>Feedbacks</span></a></li>
                     <li class="@((controller == "home" && action == "predict") ? "active" : "")"><a asp-action="Predict" asp-controller="Home"><i class="fa fa-medkit"></i> <span>Prediction</span></a></li>
                     <li class="header">USERS</li>
                     <li class="@(controller == "paitents" ? "active" : "")"><a asp-action="Index" asp-controller="Patients"><i class="fa fa-user"></i> <span>Patients</span></a></li>
@@ -366,6 +370,8 @@
     <!-- DataTables -->
     <script src="~/js/jquery.dataTables.min.js"></script>
     <script src="~/js/dataTables.bootstrap.min.js"></script>
+    <!-- Bootstrap WYSIHTML5 -->
+    <script src="~/lib/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
     <!-- Select2 -->
     <script src="~/js/select2.full.min.js"></script>
     <!-- iCheck -->

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,11 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
 using SmartHealth.Helper;
 using SmartHealth.Models;
+using SmartHealth.ViewModels;
 
 namespace SmartHealth.ApiControllers
 {
     [Route("api/[controller]")]
-    [ApiController][Authorize]
+    [ApiController] 
     public class DoctorsController : ControllerBase
     {
         private readonly HealthContext _context;
@@ -20,114 +22,97 @@ namespace SmartHealth.ApiControllers
             _context = context;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PostPatient(int[] Specialty, string Name, string Email, string Password)
+        [HttpGet("list")]
+        public async Task<IEnumerable<Doctor>> GetAllDoctors()
         {
-            if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Password))
+            return await _context.Doctors
+                .Include(d => d.SpecialtyDoctors)
+                .ThenInclude(s => s.Specialty)
+                .ToListAsync();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostDoctor(DoctorData doctor)
+        {
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-
-            var hasedPassword = Encrypt.EncryptString(Password);
-
-            var user = _context.Doctors
-                .Where(u => u.Password == hasedPassword)
-                .FirstOrDefault();
-
+            var hasedPassword = Encrypt.EncryptString(doctor.Doctor.Password);
+            var user = await _context.Doctors
+                .Where(u => u.Password == hasedPassword || u.Email == doctor.Doctor.Email)
+                .FirstOrDefaultAsync();
             if (user != null)
             {
                 return BadRequest();
             }
-
-            var doctor = new Doctor
-            {
-                Name = Name,
-                Email = Email,
-                Password = hasedPassword
-            };
-
-            _context.Doctors.Add(doctor);
-
-            foreach (var id in Specialty)
+            doctor.Doctor.Password = hasedPassword;
+            await _context.Doctors.AddAsync(doctor.Doctor);
+            foreach (var id in doctor.Specialty)
             {
                 var specialtyDoctor = new SpecialtyDoctor
                 {
-                    DoctorID = doctor.ID,
+                    DoctorID = doctor.Doctor.ID,
                     SpecialtyID = id
                 };
-                _context.SpecialtyDoctors.Add(specialtyDoctor);
+                await _context.SpecialtyDoctors.AddAsync(specialtyDoctor);
             }
-
             await _context.SaveChangesAsync();
-
             return Ok(doctor);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPatient([FromRoute] int id, int[] Specialty, string Name, string Email, string Password)
+        public async Task<IActionResult> PutDoctor(int id, DoctorData item)
         {
-            if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Password))
+            if (!ModelState.IsValid || id != item.Doctor.ID)
             {
                 return BadRequest();
             }
-
             var doctor = await _context.Doctors.FindAsync(id);
-            var hasedPassword = Encrypt.EncryptString(Password);
-
-            var user = _context.Doctors
-                .Where(u => u.Password == hasedPassword)
-                .FirstOrDefault();
-
+            var hasedPassword = Encrypt.EncryptString(item.Doctor.Password);
+            var user = await _context.Doctors
+                .Where(u => u.Password == hasedPassword || u.Email == item.Doctor.Email)
+                .FirstOrDefaultAsync();
             if (doctor == null || (user != null && user.ID != doctor.ID))
             {
                 return BadRequest();
             }
-
-            doctor.Name = Name;
-            doctor.Email = Email;
+            doctor.Name = item.Doctor.Name;
+            doctor.Email = item.Doctor.Email;
             doctor.Password = hasedPassword;
-
-            var specialtyDoctors = _context.SpecialtyDoctors
+            var specialtyDoctors = await _context.SpecialtyDoctors
                 .Where(d => d.DoctorID == doctor.ID)
                 .Include(s => s.Specialty)
-                .ToList();
-
+                .ToListAsync();
             _context.SpecialtyDoctors.RemoveRange(specialtyDoctors);
-
-            foreach (var ids in Specialty)
+            foreach (var ids in item.Specialty)
             {
                 var specialtyDoctor = new SpecialtyDoctor
                 {
                     DoctorID = doctor.ID,
                     SpecialtyID = ids
                 };
-                _context.SpecialtyDoctors.Add(specialtyDoctor);
+                await _context.SpecialtyDoctors.AddAsync(specialtyDoctor);
             }
-
             _context.Doctors.Update(doctor);
             await _context.SaveChangesAsync();
-
             return Ok(doctor);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePatient([FromRoute] int id)
+        public async Task<IActionResult> DeleteDoctor(int id)
         {
             var doctor = await _context.Doctors.FindAsync(id);
-
             if (doctor == null)
             {
                 return NotFound();
             }
-
-            var specialtyDoctors = _context.SpecialtyDoctors
+            var specialtyDoctors = await _context.SpecialtyDoctors
                 .Where(d => d.DoctorID == doctor.ID)
-                .ToList();
-
+                .ToListAsync();
             _context.SpecialtyDoctors.RemoveRange(specialtyDoctors);
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
-
             return Ok(doctor);
         }
     }

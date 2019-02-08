@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartHealth.Controllers
 {
@@ -31,14 +32,12 @@ namespace SmartHealth.Controllers
             ViewData["Specialty"] = _context.Specialties.ToList().Count;
             ViewData["Patient"] = _context.Patients.ToList().Count;
             ViewData["Doctor"] = _context.Doctors.ToList().Count;
-
             return View();
         }
 
         [Authorize]
         public IActionResult Predict()
         {
-
             return View();
         }
 
@@ -46,39 +45,34 @@ namespace SmartHealth.Controllers
         public IActionResult Login(string returnUrl)
         {
             ViewData["ReturnUrl"] = returnUrl;
-
             return View();
         }
 
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([Bind("Name,Password,RemeberMe")] Login login, string returnUrl)
+        public async Task<IActionResult> Login([Bind("Email,Password,RemeberMe")] Login login, string returnUrl)
         {
             if (ModelState.IsValid)
             {
                 string encryptedpassword = Encrypt.EncryptString(login.Password);
-
-                var admin = _context.Admins
-                    .Where(u => u.Name == login.Name && u.Password == encryptedpassword)
-                    .FirstOrDefault();
-
+                var admin = await _context.Admins
+                    .Where(u => u.Email == login.Email && u.Password == encryptedpassword)
+                    .FirstOrDefaultAsync();
                 if (admin == null)
                 {
-                    ViewData["Error"] = "Name or Password incorrect";
+                    ViewData["Error"] = "Email or Password incorrect";
                     return View(login);
                 }
-
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, admin.ID.ToString()),
                     new Claim(ClaimTypes.Name, admin.Name),
+                    new Claim(ClaimTypes.Email, admin.Email),
                     new Claim(ClaimTypes.Role, "Administrator"),
                 };
-
                 var claimsIdentity = new ClaimsIdentity(
                     claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
                 if (login.RemeberMe)
                 {
                     await HttpContext.SignInAsync(
@@ -99,7 +93,6 @@ namespace SmartHealth.Controllers
 
                 return RedirectToLocal(returnUrl);
             }
-
             return View(login);
         }
 
@@ -107,9 +100,7 @@ namespace SmartHealth.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Home");
         }
 
@@ -125,7 +116,6 @@ namespace SmartHealth.Controllers
             {
                 return Redirect(returnUrl);
             }
-
             return RedirectToAction("Index", "Home");
         }
     }

@@ -39,17 +39,44 @@ namespace SmartHealth.Migrations
                     b.ToTable("Disease");
                 });
 
+            modelBuilder.Entity("SmartHealth.Models.DoctorRating", b =>
+                {
+                    b.Property<int>("PatientID");
+
+                    b.Property<int>("DoctorID");
+
+                    b.Property<string>("Comment");
+
+                    b.Property<DateTime>("SendDate")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("PatientID", "DoctorID");
+
+                    b.HasIndex("DoctorID");
+
+                    b.ToTable("DoctorRating");
+                });
+
             modelBuilder.Entity("SmartHealth.Models.Feedback", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Content");
-
-                    b.Property<DateTime>("Date");
+                    b.Property<string>("Content")
+                        .IsRequired();
 
                     b.Property<int?>("PatientID");
+
+                    b.Property<DateTime>("SendDate")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("Title")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
@@ -64,9 +91,11 @@ namespace SmartHealth.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<int?>("PatientID");
 
@@ -75,27 +104,6 @@ namespace SmartHealth.Migrations
                     b.HasIndex("PatientID");
 
                     b.ToTable("HealthRecord");
-                });
-
-            modelBuilder.Entity("SmartHealth.Models.Rating", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Comment");
-
-                    b.Property<DateTime>("Date");
-
-                    b.Property<int?>("PatientID");
-
-                    b.Property<int>("Value");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("PatientID");
-
-                    b.ToTable("Rating");
                 });
 
             modelBuilder.Entity("SmartHealth.Models.Specialty", b =>
@@ -162,7 +170,8 @@ namespace SmartHealth.Migrations
 
                     b.Property<DateTime?>("EndDate");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<int?>("PatientID");
 
@@ -188,7 +197,8 @@ namespace SmartHealth.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<string>("Email");
+                    b.Property<string>("Email")
+                        .IsRequired();
 
                     b.Property<string>("Name")
                         .IsRequired();
@@ -223,10 +233,6 @@ namespace SmartHealth.Migrations
 
                     b.Property<string>("Information");
 
-                    b.Property<int?>("RatingID");
-
-                    b.HasIndex("RatingID");
-
                     b.ToTable("Doctor");
 
                     b.HasDiscriminator().HasValue("Doctor");
@@ -257,6 +263,19 @@ namespace SmartHealth.Migrations
                         .HasForeignKey("SpecialtyID");
                 });
 
+            modelBuilder.Entity("SmartHealth.Models.DoctorRating", b =>
+                {
+                    b.HasOne("SmartHealth.Models.Doctor", "Doctor")
+                        .WithMany("DoctorRatings")
+                        .HasForeignKey("DoctorID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartHealth.Models.Patient", "Patient")
+                        .WithMany("DoctorRatings")
+                        .HasForeignKey("PatientID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SmartHealth.Models.Feedback", b =>
                 {
                     b.HasOne("SmartHealth.Models.Patient", "Patient")
@@ -268,13 +287,6 @@ namespace SmartHealth.Migrations
                 {
                     b.HasOne("SmartHealth.Models.Patient", "Patient")
                         .WithMany()
-                        .HasForeignKey("PatientID");
-                });
-
-            modelBuilder.Entity("SmartHealth.Models.Rating", b =>
-                {
-                    b.HasOne("SmartHealth.Models.Patient")
-                        .WithMany("Ratings")
                         .HasForeignKey("PatientID");
                 });
 
@@ -309,13 +321,6 @@ namespace SmartHealth.Migrations
                     b.HasOne("SmartHealth.Models.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientID");
-                });
-
-            modelBuilder.Entity("SmartHealth.Models.Doctor", b =>
-                {
-                    b.HasOne("SmartHealth.Models.Rating", "Rating")
-                        .WithMany()
-                        .HasForeignKey("RatingID");
                 });
 #pragma warning restore 612, 618
         }
