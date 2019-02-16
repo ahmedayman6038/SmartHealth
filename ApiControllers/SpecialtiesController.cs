@@ -23,8 +23,7 @@ namespace SmartHealth.ApiControllers
         [HttpGet("list")]
         public async Task<IEnumerable<Specialty>> GetAllSpecialty()
         {
-            return await _context.Specialties
-                    .ToListAsync();
+            return await _context.Specialties.ToListAsync();
         }
 
         [HttpGet]

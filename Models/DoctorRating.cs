@@ -10,6 +10,7 @@ namespace SmartHealth.Models
         public int DoctorID { get; set; }
         public Doctor Doctor { get; set; }
         [Required]
+        [Range(1, 5)]
         public int Value { get; set; }
         public string Comment { get; set; }
         public DateTime SendDate { get; set; }

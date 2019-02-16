@@ -22,13 +22,51 @@ namespace SmartHealth.ApiControllers
             _context = context;
         }
 
-        [HttpGet("list")]
+        [HttpGet("List")]
         public async Task<IEnumerable<Doctor>> GetAllDoctors()
         {
             return await _context.Doctors
                 .Include(d => d.SpecialtyDoctors)
                 .ThenInclude(s => s.Specialty)
                 .ToListAsync();
+        }
+
+        [HttpGet]
+        public async Task<IEnumerable<Doctor>> GetDoctor(string Name)
+        {
+            return await _context.Doctors
+                    .Where(s => s.Name.Contains(Name))
+                    .ToListAsync();
+        }
+
+        [HttpPost("Rate")]
+        public async Task<IActionResult> DoctorRating(DoctorRating rating)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var patient = await _context.Patients.FindAsync(rating.PatientID);
+            var doctor = await _context.Doctors.FindAsync(rating.DoctorID);
+            if(patient == null || doctor == null)
+            {
+                return NotFound("Patient or Doctor not exist");
+            }
+            var doctorRate = await _context.DoctorRatings
+                .Where(r => r.PatientID == rating.PatientID && r.DoctorID == rating.DoctorID)
+                .FirstOrDefaultAsync();
+            if(doctorRate == null)
+            {
+                await _context.DoctorRatings.AddAsync(rating);
+            }
+            else
+            {
+                doctorRate.Value = rating.Value;
+                doctorRate.Comment = rating.Comment;
+                _context.DoctorRatings.Update(doctorRate);
+            }
+            await _context.SaveChangesAsync();
+            return Ok(rating);
         }
 
         [HttpPost]

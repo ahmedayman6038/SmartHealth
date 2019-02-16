@@ -28,22 +28,21 @@
                         <h3 class="box-title">Predict Disease</h3>
                     </div>
                     <!-- /.box-header -->
-                    <!-- form start -->
-                    <form id="myForm">
+                    <div id="prediction">
                         <div class="box-body">
-                            <label for="SName">Enter symptom that's troubling you the most.</label>
+                            <label for="Name">Enter symptom that's troubling you the most.</label>
                             <div class="input-group input-group-sm">
 
-                                <input type="text" name="SName" id="SName" list="results" class="form-control">
+                                <input type="text" name="Name" id="Name" list="results" class="form-control">
                                 <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-info btn-flat">Go!</button>
+                                    <button id="InitializePrediction" class="btn btn-info btn-flat">Go!</button>
                                 </span>
                             </div>
                             <datalist id="results"></datalist>
                             <p id="error" class="text-danger"></p>
                         </div>
-                        <!-- /.box-body -->
-                    </form>
+                    <!-- /.box-body -->
+                    </div>
                 </div>
                 <!-- /.box -->
 
@@ -52,55 +51,6 @@
 
         </div>
         <!-- /.row-->
-        <!-- <div class="row">
-                <div class="col-md-12">
-                    <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">Predict Disease</h3>
-                        </div>
-                        <form id="myForm2">
-                            <div class="box-body">
-                                <div class="form-group">
-                                    <label>Are you face any of these symptoms?</label>
-                                    <div class="radio icheck">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-                                            صداع
-                                        </label>
-                                    </div>
-                                    <div class="radio icheck">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                            الم فى الراس
-                                        </label>
-                                    </div>
-                                    <div class="radio icheck">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                            الم فى الراس
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="box-footer">
-                                <button id="notFound" type="button" class="btn btn-success">Don't have any of these symptoms!</button>
-                                <button type="submit" class="btn btn-primary">Next</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-    -->
-
-
-
-
-
-
-
-
-
     </section>
     <!-- /.content -->
 </div>
@@ -154,54 +104,38 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(function () {
-            $("#SName").keyup(function () {
+            $('#Name').keyup(delay(function (e) {
                 $("#results").empty();
-                $("#error").empty();
-                var sname = $('#SName').val();
-                $.ajax({
-                    url: '/api/Prediction?Name=' + sname,
-                    type: 'GET',
-                    dataType: 'json',
-                    error: function () {
-                        $('#modal-danger').modal('show');
-                    },
-                    success: function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            $("#results").append("<option>" + data[i] + "</option>");
-                        }
-                    },
-                });
-            });
-            $('#myForm').submit(function (e) {
-                e.preventDefault();
-                if ($("#SName").val()) {
-                    var sname = $('#SName').val();
-                    $.ajax({
-                        url: '/api/Prediction/Initialize?SName=' + sname,
-                        type: 'GET',
-                        dataType: 'json',
-                        error: function () {
-                            $('#modal-danger').modal('show');
-                        },
-                        success: function (data) {
-                            $("#myForm").remove();
-                            $(".box").append('<form id="myForm"><div class="box-body"><div class="form-group"><label>Are you face any of these symptoms?</label></div></div><div class="box-footer"><button style="margin-right: 5px;" id="notFound" type="button" class="btn btn-success">Dont have any of these symptoms!</button><button type="submit" class="btn btn-primary">Next</button></div></form>');
-                            for (var i = 0; i < data.length; i++) {
-                                $(".form-group").append('<div class="radio icheck"><label><input type="radio" name="Id" value="'+data[i].id+'">'+data[i].name+'</label></div>');
-                            }
-                            $('input').iCheck({
-                                checkboxClass: 'icheckbox_square-blue',
-                                radioClass: 'iradio_square-blue margin',
-                                increaseArea: '20%' /* optional */
-                            });
-                            $('.row').addClass('animated fadeInRight');
-                        },
-                    });
+                var name = $('#Name').val();
+                searchSymptom(name);
+            }, 500));
+            $(document).on("click", '#InitializePrediction', function () {
+                var name = $('#Name').val();
+                if (name) {
+                    InitializePrediction(name);
                 } else {
                     $("#error").empty();
                     $("#error").append("Please enter a symptom");
                 }
-            })
+            });
+            $(document).on("click", '#StartPrediction', function () {
+                var symptomId = $("input[name='SymptomId']:checked").val();
+                if (symptomId) {
+                    StartPrediction(symptomId);
+                } else {
+                    $("#error").empty();
+                    $("#error").append("Please select a symptom");
+                }
+            });
+            $(document).on("click", '#NotFounded', function () {
+                var symptomId = $('#NotFounded').data("symptom");
+                if (symptomId) {
+                    StartPrediction(symptomId);
+                } else {
+                    $("#error").empty();
+                    $("#error").append("error");
+                }
+            });
         })
     </script>
 }

@@ -5,6 +5,75 @@
 $(document).ajaxStart(function () {
     Pace.restart();
 })
+function InitializePrediction(name) {
+    $.ajax({
+        url: '/api/app/InitializePrediction?Name=' + name,
+        type: 'GET',
+        dataType: 'json',
+        error: function () {
+            $('#modal-danger').modal('show');
+        },
+        success: function (data) {
+            if (data != null) {
+                StartPrediction(data.id)
+            } else {
+                $('#modal-danger').modal('show');
+            }
+        },
+    });
+}
+function StartPrediction(id) {
+    $.ajax({
+        url: '/api/app/StartPrediction/' + id,
+        type: 'GET',
+        dataType: 'json',
+        error: function () {
+            $('#modal-danger').modal('show');
+        },
+        success: function (data) {
+            if (data.length > 0) {
+                $("#prediction").remove();
+                $(".box").append('<div id="prediction"><div class="box-body"><div class="form-group"><label>Are you face any of these symptoms?</label></div></div><div class="box-footer"><button style="margin-right: 5px;" id="NotFounded" class="btn btn-success" data-symptom="' + id + '">Dont have any of these symptoms!</button><button id="StartPrediction" class="btn btn-primary">Next</button></div></div>');
+                for (var i = 0; i < data.length; i++) {
+                    $(".form-group").append('<div class="radio icheck"><label><input type="radio" name="SymptomId" value="' + data[i].id + '">' + data[i].name + '</label></div>');
+                }
+                $(".form-group").append('<p id="error" class="text-danger"></p>');
+                $('input').iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue margin',
+                    increaseArea: '20%'
+                });
+            } else {
+                EndPrediction();
+            }
+        }
+    });
+}
+function EndPrediction() {
+    $.ajax({
+        url: '/api/app/EndPrediction',
+        type: 'GET',
+        dataType: 'json',
+        error: function () {
+            $('#modal-danger').modal('show');
+        },
+        success: function (data) {
+            $("#prediction").remove();
+            $(".box").append('<div id="prediction"><div class="box-body"><dl class="dl-horizontal"><dt>Result</dt><dd><ul id="showResult">');
+            if (data.diseases.length > 0) {
+                for (var i = 0; i < data.diseases.length; i++) {
+                    $("#showResult").append('<li>' + data.diseases[i].name + ' <p>(' + data.diseases[i].specialty.name + ')</p></li>');
+                }
+                for (var i = 0; i < data.doctors.length; i++) {
+                    $("#showResult").append('<li>' + data.doctors[i].name + '</li>');
+                }
+            } else {
+                $("#showResult").append('<li>no suggested diseases</li>');
+            }
+            $(".box").append('</ul></dd></dl></div></div>');
+        },
+    });
+}
 function searchSymptom(name) {
     var url = '/api/Symptoms?Name=' + name;
     searchAjaxCall(url);

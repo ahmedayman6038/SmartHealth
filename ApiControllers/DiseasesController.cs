@@ -47,7 +47,7 @@ namespace SmartHealth.ApiControllers
             }
             disease.Disease.Specialty = type;
             await _context.Diseases.AddAsync(disease.Disease);
-            foreach (var id in disease.symptoms)
+            foreach (var id in disease.Symptoms)
             {
                 var symptomDiseases = new SymptomDisease
                 {
@@ -84,7 +84,7 @@ namespace SmartHealth.ApiControllers
                 .Include(s => s.Symptom)
                 .ToListAsync();
             _context.SymptomDiseases.RemoveRange(symptomDiseases);
-            foreach (var ids in item.symptoms)
+            foreach (var ids in item.Symptoms)
             {
                 var symptomDisease = new SymptomDisease
                 {
