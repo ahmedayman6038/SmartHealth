@@ -75,10 +75,31 @@ namespace SmartHealth.ApiControllers
             return symptoms;
         }
 
-        [HttpGet("[action]")]
-        public async Task<ActionResult<PredictionResult>> EndPrediction()
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult<PredictionResult>> EndPrediction([FromRoute]int id)
         {
+            var patient = await _context.Patients.FindAsync(id);
+            if(patient == null)
+            {
+                return NotFound("Patient not founded");
+            }
             var predictionResult = await GetPredictionResult();
+            string info = "";
+            foreach (var item in selectedSymptoms)
+            {
+                info += item.ToString() + "/";
+            }
+            var firstSyptom = await _context.Symptoms.FindAsync(selectedSymptoms.ElementAt(0));
+            if(firstSyptom == null)
+            {
+                return NotFound("First symptom not founder");
+            }
+            Assessment assessment = new Assessment();
+            assessment.Name = firstSyptom.Name;
+            assessment.Information = Encrypt.EncryptString(info);
+            assessment.Patient = patient;
+            await _context.Assessments.AddAsync(assessment);
+            await _context.SaveChangesAsync();
             chosenSymptoms = null;
             selectedSymptoms = null;
             return Ok(predictionResult);

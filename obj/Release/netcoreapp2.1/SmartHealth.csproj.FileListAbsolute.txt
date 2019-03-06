@@ -52,3 +52,7 @@ E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\SmartHealth.
 E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\SmartHealth.dll
 E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\SmartHealth.pdb
 E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\SmartHealth.csproj.CopyComplete
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\Razor\Views\Feedbacks\Create.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\Razor\Views\Feedbacks\Details.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\Razor\Views\Feedbacks\Index.g.cshtml.cs
+E:\DotNetProjects\SmartHealth\SmartHealth\obj\Release\netcoreapp2.1\Razor\Views\Feedbacks\Reply.g.cshtml.cs

@@ -3,13 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SmartHealth.Models
 {
-    public class Treatment
+    public class Assessment
     {
         public int ID { get; set; }
         [Required]
         public string Name { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        [Required]
+        public string Information { get; set; }
+        public DateTime Date { get; set; }
         public Patient Patient { get; set; }
     }
 }

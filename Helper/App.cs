@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
 using SmartHealth.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SmartHealth.Helper
 {
@@ -25,6 +23,10 @@ namespace SmartHealth.Helper
                .Include(s => s.Doctor)
                .Select(s => s.Doctor)
                .ToList();
+            if (doctors.Count == 0)
+            {
+                return doctors;
+            }
             var doctorRating = doctors.GroupBy(x => x.ID).ToDictionary(x => x.Key, x => CalculateDoctorRating(x.Key));
             var maxRate = doctorRating.OrderByDescending(x => x.Value).First().Value;
             var doctorsId = doctorRating
