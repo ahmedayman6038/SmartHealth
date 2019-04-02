@@ -80,7 +80,7 @@ using System.Security.Claims;
             WriteLiteral("<!-- Content Wrapper. Contains page content -->\r\n<div class=\"content-wrapper\">\r\n    <!-- Content Header (Page header) -->\r\n    <section class=\"content-header\">\r\n        <h1>\r\n            Diseases\r\n            <small>");
             EndContext();
             BeginContext(307, 60, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "9ae38697f1614413b779ff49a75e43d5", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "6d1a045bd97c4c4aafe71fcb54a66963", async() => {
                 BeginContext(356, 7, true);
                 WriteLiteral("Add New");
                 EndContext();
@@ -199,7 +199,7 @@ WriteAttributeValue("", 1682, item.ID, 1682, 8, false);
             WriteLiteral("</td>\r\n                                        <td>\r\n                                            ");
             EndContext();
             BeginContext(2084, 187, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "c219fdf180744e4f90987e762982e00d", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "38d433ddc1384eb4baf4f87303ca25e8", async() => {
                 BeginContext(2234, 33, true);
                 WriteLiteral("<i class=\"fa fa-info-circle\"></i>");
                 EndContext();
@@ -238,7 +238,7 @@ WriteAttributeValue("", 1682, item.ID, 1682, 8, false);
             WriteLiteral("\r\n                                            ");
             EndContext();
             BeginContext(2317, 178, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "c530e9a9c1694d3083963fa4eee572db", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "52712aa548cb491cb1d7b6e707071c04", async() => {
                 BeginContext(2462, 29, true);
                 WriteLiteral("<i class=\"fa fa-refresh\"></i>");
                 EndContext();

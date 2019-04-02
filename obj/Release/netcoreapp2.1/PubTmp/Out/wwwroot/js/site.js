@@ -44,14 +44,14 @@ function StartPrediction(id) {
                     increaseArea: '20%'
                 });
             } else {
-                EndPrediction();
+                EndPrediction(20);
             }
         }
     });
 }
-function EndPrediction() {
+function EndPrediction(id) {
     $.ajax({
-        url: '/api/app/EndPrediction',
+        url: '/api/app/EndPrediction/' + id,
         type: 'GET',
         dataType: 'json',
         error: function () {

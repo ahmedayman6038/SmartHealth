@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartHealth.Data;
 using SmartHealth.Helper;
 using SmartHealth.Models;
+using SmartHealth.ViewModels;
 
 namespace SmartHealth.ApiControllers
 {
@@ -19,6 +18,24 @@ namespace SmartHealth.ApiControllers
         public PatientsController(HealthContext context)
         {
             _context = context;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(Login login)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            string encryptedpassword = Encrypt.EncryptString(login.Password);
+            var patient = await _context.Patients
+                .Where(u => u.Email == login.Email && u.Password == encryptedpassword)
+                .FirstOrDefaultAsync();
+            if (patient == null)
+            {
+                return NotFound("This Patient Not Exist");
+            }
+            return Ok(patient);
         }
 
         [HttpPost]
