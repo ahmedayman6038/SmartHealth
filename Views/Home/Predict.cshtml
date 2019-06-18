@@ -104,6 +104,10 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(function () {
+            selectedValue = null;
+            $("input[name=Name]").focusout(function () {
+                selectedValue = $(this).val();
+            });
             $('#Name').keyup(delay(function (e) {
                 $("#results").empty();
                 var name = $('#Name').val();
@@ -111,8 +115,8 @@
             }, 500));
             $(document).on("click", '#InitializePrediction', function () {
                 var name = $('#Name').val();
-                if (name) {
-                    InitializePrediction(name);
+                if (name && selectedValue != null) {
+                    InitializePrediction(selectedValue);
                 } else {
                     $("#error").empty();
                     $("#error").append("Please enter a symptom");

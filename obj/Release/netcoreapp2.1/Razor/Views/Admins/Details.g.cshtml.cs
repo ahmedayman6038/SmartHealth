@@ -74,7 +74,7 @@ using System.Security.Claims;
             WriteLiteral("\r\n<!-- Content Wrapper. Contains page content -->\r\n<div class=\"content-wrapper\">\r\n    <!-- Content Header (Page header) -->\r\n    <section class=\"content-header\">\r\n        <h1>\r\n            Admins\r\n            <small>");
             EndContext();
             BeginContext(294, 59, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ce8ce1c0681b415ab77252e0bc0c7a05", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "3393b1c602a24dc69cc91189df6a6432", async() => {
                 BeginContext(340, 9, true);
                 WriteLiteral("View List");
                 EndContext();

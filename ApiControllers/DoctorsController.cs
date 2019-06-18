@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -16,27 +17,87 @@ namespace SmartHealth.ApiControllers
     public class DoctorsController : ControllerBase
     {
         private readonly HealthContext _context;
+        private App myApp;
 
         public DoctorsController(HealthContext context)
         {
             _context = context;
+            myApp = new App(_context);
         }
 
-        [HttpGet("List")]
-        public async Task<IEnumerable<Doctor>> GetAllDoctors()
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult<DoctorProfile>> GetDoctorProfile([FromRoute] int id)
         {
-            return await _context.Doctors
-                .Include(d => d.SpecialtyDoctors)
-                .ThenInclude(s => s.Specialty)
+            var doctor = await _context.Doctors.FindAsync(id);
+            if(doctor == null)
+            {
+                return NotFound();
+            }
+            DoctorProfile doctorProfile = new DoctorProfile
+            {
+                ID = doctor.ID,
+                Name = doctor.Name,
+                City = doctor.City,
+                Address = doctor.Address,
+                Information = doctor.Information,
+                Rating = myApp.CalculateDoctorRating(doctor.ID)
+            };
+            return doctorProfile;
+        }
+
+        [HttpPost("[action]/{id}/{patientId}")]
+        public async Task<ActionResult<DoctorRating>> Rate([FromRoute] int id, [FromRoute] int patientId, [FromQuery] int value)
+        {
+            DoctorRating doctorRating = await _context.DoctorRatings
+                                .Where(r => r.DoctorID == id && r.PatientID == patientId)
+                                .SingleOrDefaultAsync();
+            if(doctorRating == null)
+            {
+                doctorRating = new DoctorRating();
+                doctorRating.DoctorID = id;
+                doctorRating.PatientID = patientId;
+                doctorRating.Value = value;
+                await _context.DoctorRatings.AddAsync(doctorRating);
+            }
+            else
+            {
+                doctorRating.Value = value;
+                _context.DoctorRatings.Update(doctorRating);
+            }
+            await _context.SaveChangesAsync();
+            return Ok(doctorRating);
+        }
+        [HttpGet("[action]/{id}/{patientId}")]
+        public async Task<ActionResult<int>> GetRate([FromRoute] int id, [FromRoute] int patientId)
+        {
+            var doctorRating = await _context.DoctorRatings
+                                .Where(r => r.DoctorID == id && r.PatientID == patientId)
+                                .SingleOrDefaultAsync();
+            if (doctorRating == null)
+            {
+                return NotFound("Not founded");
+            }
+            return Ok(doctorRating.Value);
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<IEnumerable<DoctorProfile>> GetDoctorsBySpecialties([FromRoute] int id)
+        {
+            List<Doctor> doctors = await _context.SpecialtyDoctors
+                .Where(s => s.SpecialtyID == id)
+                .Include(d => d.Doctor)
+                .Select(d => d.Doctor)
                 .ToListAsync();
+            return await myApp.GetDoctorsData(doctors);
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Doctor>> GetDoctor(string Name)
+        public async Task<IEnumerable<DoctorProfile>> GetDoctor(string Name)
         {
-            return await _context.Doctors
+            List<Doctor> doctors = await _context.Doctors
                     .Where(s => s.Name.Contains(Name))
                     .ToListAsync();
+            return await myApp.GetDoctorsData(doctors);
         }
 
         [HttpPost("Rate")]
@@ -118,6 +179,9 @@ namespace SmartHealth.ApiControllers
             doctor.Name = item.Doctor.Name;
             doctor.Email = item.Doctor.Email;
             doctor.Password = hasedPassword;
+            doctor.City = item.Doctor.City;
+            doctor.Address = item.Doctor.Address;
+            doctor.Information = item.Doctor.Information;
             var specialtyDoctors = await _context.SpecialtyDoctors
                 .Where(d => d.DoctorID == doctor.ID)
                 .Include(s => s.Specialty)
@@ -148,7 +212,11 @@ namespace SmartHealth.ApiControllers
             var specialtyDoctors = await _context.SpecialtyDoctors
                 .Where(d => d.DoctorID == doctor.ID)
                 .ToListAsync();
+            var doctorsRating = await _context.DoctorRatings
+                .Where(d => d.DoctorID == doctor.ID)
+                .ToListAsync();
             _context.SpecialtyDoctors.RemoveRange(specialtyDoctors);
+            _context.DoctorRatings.RemoveRange(doctorsRating);
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
             return Ok(doctor);

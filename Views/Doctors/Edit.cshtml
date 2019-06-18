@@ -45,6 +45,20 @@
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
                             <div class="form-group">
+                                <label asp-for="City"></label>
+                                <input asp-for="City" class="form-control" placeholder="City">
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Address"></label>
+                                <input asp-for="Address" class="form-control" placeholder="Address">
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <textarea asp-for="Information" class="form-control" style="height: 300px"></textarea>
+                                <span asp-validation-for="Information" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
                                 <label asp-for="Password"></label>
                                 <input asp-for="Password" class="form-control" placeholder="Password">
                                 <span asp-validation-for="Password" class="text-danger"></span>
@@ -129,10 +143,20 @@
                 @:list.push(@item); 
             }
             $select.val(list).trigger("change");
+            jQuery('#Information').wysihtml5({
+                "events": {
+                    "load": function () {
+                        jQuery('#Information').addClass('nicehide');
+                    }
+                }
+            })
             $('#resetData').click(function () {
                 $('#Name').val("").focus();
                 $('#Email').val("");
                 $('#Password').val("");
+                $('#City').val("");
+                $('#Address').val("");
+                $('#Information').val("");
                 $select.val(null).trigger("change");
             })
             $('#myForm').submit(function (e) {
@@ -141,10 +165,13 @@
                     var name = $('#Name').val();
                     var email = $('#Email').val();
                     var password = $('#Password').val();
+                    var city = $('#City').val();
+                    var address = $('#Address').val();
+                    var information = $('#Information').val();
                     var id = $('#ID').val();
                     var specialty = new Array();
                     specialty = $("#Specialty").val();
-                    updateDoctor(id, specialty, name, email, password);
+                    updateDoctor(id, specialty, name, email, password, city, address, information);
                 }
             })
         })

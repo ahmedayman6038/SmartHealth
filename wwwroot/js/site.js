@@ -5,9 +5,9 @@
 $(document).ajaxStart(function () {
     Pace.restart();
 })
-function InitializePrediction(name) {
+function InitializePrediction(id) {
     $.ajax({
-        url: '/api/app/InitializePrediction?Name=' + name,
+        url: '/api/app/InitializePrediction/' + id,
         type: 'GET',
         dataType: 'json',
         error: function () {
@@ -15,7 +15,7 @@ function InitializePrediction(name) {
         },
         success: function (data) {
             if (data != null) {
-                StartPrediction(data.id)
+                StartPrediction(id)
             } else {
                 $('#modal-danger').modal('show');
             }
@@ -24,7 +24,7 @@ function InitializePrediction(name) {
 }
 function StartPrediction(id) {
     $.ajax({
-        url: '/api/app/StartPrediction/' + id,
+        url: '/api/app/Predict/' + id,
         type: 'GET',
         dataType: 'json',
         error: function () {
@@ -52,6 +52,32 @@ function StartPrediction(id) {
 function EndPrediction(id) {
     $.ajax({
         url: '/api/app/EndPrediction/' + id,
+        type: 'GET',
+        dataType: 'json',
+        error: function () {
+            $('#modal-danger').modal('show');
+        },
+        success: function (data) {
+            $("#prediction").remove();
+            $(".box").append('<div id="prediction"><div class="box-body"><dl class="dl-horizontal"><dt>Result</dt><dd><ul id="showResult">');
+            if (data != 0) {
+                /*for (var i = 0; i < data.diseases.length; i++) {
+                    $("#showResult").append('<li>' + data.diseases[i].name + ' <p>(' + data.diseases[i].specialty.name + ')</p></li>');
+                }
+                for (var i = 0; i < data.doctors.length; i++) {
+                    $("#showResult").append('<li>' + data.doctors[i].name + '</li>');
+                }*/
+                GetPredictionResult(data.id);
+            } else {
+                $("#showResult").append('<li>no suggested diseases</li>');
+            }
+            $(".box").append('</ul></dd></dl></div></div>');
+        },
+    });
+}
+function GetPredictionResult(id) {
+    $.ajax({
+        url: '/api/app/GetPredictionResult/' + id,
         type: 'GET',
         dataType: 'json',
         error: function () {
@@ -151,13 +177,16 @@ function deletePatient(id, table) {
     var url = '/api/Patients/' + id;
     deleteAjaxCall(url, id, table);
 }
-function addDoctor(specialty, name, email, password) {
+function addDoctor(specialty, name, email, password, city, address, information) {
     var url = '/api/Doctors';
     var type = 'POST';
     var doctor = {
         Name: name,
         Email: email,
-        Password: password
+        Password: password,
+        City: city,
+        Address: address,
+        Information: information
     };
     var data = {
         Doctor: doctor,
@@ -165,14 +194,17 @@ function addDoctor(specialty, name, email, password) {
     };
     saveAjaxCall(url, type, data);
 }
-function updateDoctor(id, specialty, name, email, password) {
+function updateDoctor(id, specialty, name, email, password, city, address, information) {
     var url = '/api/Doctors/' + id;
     var type = 'PUT';
     var doctor = {
         ID: id,
         Name: name,
         Email: email,
-        Password: password
+        Password: password,
+        City: city,
+        Address: address,
+        Information: information
     };
     var data = {
         Doctor: doctor,
@@ -285,7 +317,7 @@ function searchAjaxCall(url) {
         },
         success: function (data) {
             for (var i = 0; i < data.length; i++) {
-                $("#results").append("<option>" + data[i] + "</option>");
+                $("#results").append("<option value='" + data[i].id + "'>" + data[i].name + "</option>");
             }
         },
     });

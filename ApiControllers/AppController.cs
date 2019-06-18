@@ -15,10 +15,9 @@ namespace SmartHealth.ApiControllers
     public class AppController : ControllerBase
     {
         private readonly HealthContext _context;
-        private static List<int> chosenSymptoms;
-        private static List<int> selectedSymptoms;
-        private readonly App myApp;
-
+        private List<int> chosenSymptoms;
+        private List<int> selectedSymptoms;
+        private App myApp;
         public AppController(HealthContext context)
         {
             _context = context;
@@ -26,71 +25,71 @@ namespace SmartHealth.ApiControllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login(Login login)
+        public async Task<IActionResult> PatientLogin(Login login,[FromQuery] string type)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid Inputs");
+                return BadRequest();
             }
-            string encryptedpassword = Encrypt.EncryptString(login.Password);
+            string encryptedpassword;
+            if (type == "normal")
+            {
+                encryptedpassword = Encrypt.EncryptString(login.Password);
+            }
+            else
+            {
+                encryptedpassword = login.Password;
+            }
             var patient = await _context.Patients
-                        .Where(u => u.Email == login.Email && u.Password == encryptedpassword)
-                        .FirstOrDefaultAsync();
+                .Where(u => u.Email == login.Email && u.Password == encryptedpassword)
+                .FirstOrDefaultAsync();
             if (patient == null)
             {
-                return NotFound("This user not founded");
+                return NotFound("This Patient Not Exist");
             }
-            return Ok("Valid Login");
-        }
-
-        [HttpGet("[action]")]
-        public async Task<IActionResult> InitializePrediction(string name)
-        {
-            var symptom = await _context.Symptoms
-                .Where(s => s.Name == name)
-                .FirstOrDefaultAsync();
-            if (symptom == null)
-            {
-                return NotFound();
-            }
-            chosenSymptoms = new List<int>();
-            selectedSymptoms = new List<int>();
-            chosenSymptoms.Add(symptom.ID);
-            return Ok(symptom);
+            return Ok(patient);
         }
 
         [HttpGet("[action]/{id}")]
-        public async Task<ActionResult<List<Symptom>>> StartPrediction([FromRoute]int id)
+        public IActionResult InitializePrediction([FromRoute] int id)
         {
-            var symptom = await _context.Symptoms.FindAsync(id);
-            if (symptom == null)
-            {
-                return NotFound();
-            }
+            chosenSymptoms = new List<int>();
+            selectedSymptoms = new List<int>();
+            chosenSymptoms.Add(id);
+            HttpContext.Session.SetObjectAsJson("chosenSymptoms", chosenSymptoms);
+            HttpContext.Session.SetObjectAsJson("selectedSymptoms", selectedSymptoms);
+            return Ok(id);
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult<List<Symptom>>> Predict([FromRoute]int id)
+        {
+            selectedSymptoms = HttpContext.Session.GetObjectFromJson<List<int>>("selectedSymptoms");
             if (!selectedSymptoms.Contains(id))
             {
                 selectedSymptoms.Add(id);
             }
+            HttpContext.Session.SetObjectAsJson("selectedSymptoms", selectedSymptoms);
             var symptoms = await GetNextSymptomsAsync(id);
-            return symptoms;
+            return Ok(symptoms);
         }
 
         [HttpGet("[action]/{id}")]
-        public async Task<ActionResult<PredictionResult>> EndPrediction([FromRoute]int id)
+        public async Task<ActionResult<Assessment>> EndPrediction([FromRoute]int id)
         {
+            selectedSymptoms = HttpContext.Session.GetObjectFromJson<List<int>>("selectedSymptoms");
             var patient = await _context.Patients.FindAsync(id);
-            if(patient == null)
+            if (patient == null)
             {
                 return NotFound("Patient not founded");
             }
-            var predictionResult = await GetPredictionResult();
             string info = "";
             foreach (var item in selectedSymptoms)
             {
                 info += item.ToString() + "/";
             }
             var firstSyptom = await _context.Symptoms.FindAsync(selectedSymptoms.ElementAt(0));
-            if(firstSyptom == null)
+            if (firstSyptom == null)
             {
                 return NotFound("First symptom not founder");
             }
@@ -100,15 +99,46 @@ namespace SmartHealth.ApiControllers
             assessment.Patient = patient;
             await _context.Assessments.AddAsync(assessment);
             await _context.SaveChangesAsync();
-            chosenSymptoms = null;
-            selectedSymptoms = null;
+            return Ok(assessment);
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult<PredictionResult>> GetPredictionResult([FromRoute]int id)
+        {
+            var assessment = await _context.Assessments.FindAsync(id);
+            if(assessment == null)
+            {
+                return NotFound("Result not founded");
+            }
+            string[] info = Encrypt.DecryptString(assessment.Information).Split("/");
+            selectedSymptoms = new List<int>();
+            for (int i = 0; i < info.Length - 1; i++)
+            {
+                int symptomId = int.Parse(info[i]);
+                selectedSymptoms.Add(symptomId);
+            }
+            var predictionResult = await myApp.GetPredictionResult(selectedSymptoms);
             return Ok(predictionResult);
+        }
+
+        [HttpDelete("[action]/{id}")]
+        public async Task<IActionResult> DeletePredictionResult([FromRoute]int id)
+        {
+            var assessment = await _context.Assessments.FindAsync(id);
+            if (assessment == null)
+            {
+                return NotFound();
+            }
+            _context.Assessments.Remove(assessment);
+            await _context.SaveChangesAsync();
+            return Ok(assessment);
         }
 
         private Task<List<Symptom>> GetNextSymptomsAsync(int symptomId)
         {
             return Task.Run(() =>
             {
+                chosenSymptoms = HttpContext.Session.GetObjectFromJson<List<int>>("chosenSymptoms");
                 var nextSymptoms = new List<Symptom>();
                 // Get all diseases of this symptom
                 var diseasesID = _context.SymptomDiseases
@@ -190,43 +220,11 @@ namespace SmartHealth.ApiControllers
                         symptomsFrequency.Remove(selectedSymptom.ID);
                     }
                 }
+                HttpContext.Session.SetObjectAsJson("chosenSymptoms", chosenSymptoms);
                 return nextSymptoms;
             });
         }
 
-        private Task<PredictionResult> GetPredictionResult()
-        {
-            return Task.Run(() =>
-            {
-                PredictionResult result = new PredictionResult();
-                var diseasesList = new List<int>();
-                foreach (var id in selectedSymptoms)
-                {
-                    var diseases = _context.SymptomDiseases
-                        .Where(d => d.SymptomID == id)
-                        .Select(s => s.DiseaseID)
-                        .ToList();
-                    diseasesList.AddRange(diseases);
-                }
-                var diseasesFrequency = diseasesList.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
-                var maxFrequency = diseasesFrequency.OrderByDescending(s => s.Value).First().Value;
-                var diseasesId = diseasesFrequency
-                       .Where(f => f.Value == maxFrequency)
-                       .Select(s => s.Key)
-                       .ToList();
-                var selectedDiseases = _context.Diseases
-                      .Where(s => diseasesId.Contains(s.ID))
-                      .Include(s => s.Specialty)
-                      .ToList();
-                result.Diseases = selectedDiseases;
-                result.Doctors = new List<Doctor>();
-                foreach (var disease in selectedDiseases)
-                {
-                    result.Doctors.AddRange(myApp.GetSuggestedDoctors(disease.Specialty.ID));
-                }
-                result.Doctors.Distinct();
-                return result;
-            });
-        }
+      
     }
 }

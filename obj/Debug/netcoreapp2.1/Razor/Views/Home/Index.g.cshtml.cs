@@ -119,7 +119,7 @@ using System.Security.Claims;
             WriteLiteral("</h3>\r\n\r\n                        <p>Disease</p>\r\n                    </div>\r\n                    <div class=\"icon\">\r\n                        <i class=\"ion ion-stats-bars\"></i>\r\n                    </div>\r\n                    ");
             EndContext();
             BeginContext(1094, 127, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "833ca4ec27ec49acbe25224ed46f6745", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "b4c132397a9e444889a80678dbf5e50c", async() => {
                 BeginContext(1167, 50, true);
                 WriteLiteral("More info <i class=\"fa fa-arrow-circle-right\"></i>");
                 EndContext();
@@ -162,7 +162,7 @@ using System.Security.Claims;
             WriteLiteral("</h3>\r\n\r\n                        <p>Specialty</p>\r\n                    </div>\r\n                    <div class=\"icon\">\r\n                        <i class=\"ion ion-ios-list-outline\"></i>\r\n                    </div>\r\n                    ");
             EndContext();
             BeginContext(1750, 130, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "0ef45d559aa6426ea2d6a2162a55f02a", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "2aceccff37e448eeb51989386aa12db4", async() => {
                 BeginContext(1826, 50, true);
                 WriteLiteral("More info <i class=\"fa fa-arrow-circle-right\"></i>");
                 EndContext();
@@ -205,7 +205,7 @@ using System.Security.Claims;
             WriteLiteral("</h3>\r\n\r\n                        <p>Patient</p>\r\n                    </div>\r\n                    <div class=\"icon\">\r\n                        <i class=\"ion ion-person-stalker\"></i>\r\n                    </div>\r\n                    ");
             EndContext();
             BeginContext(2404, 127, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "552b166cd53f4fcd8dd90e8830bc88ff", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "6b486a0720a54d15914885f0b1104b76", async() => {
                 BeginContext(2477, 50, true);
                 WriteLiteral("More info <i class=\"fa fa-arrow-circle-right\"></i>");
                 EndContext();
@@ -248,7 +248,7 @@ using System.Security.Claims;
             WriteLiteral("</h3>\r\n\r\n                        <p>Doctor</p>\r\n                    </div>\r\n                    <div class=\"icon\">\r\n                        <i class=\"ion ion-person\"></i>\r\n                    </div>\r\n                    ");
             EndContext();
             BeginContext(3042, 126, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "1acc3c92c18b44cea24e74d98a060106", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "c5b9d102fabf4b65b6af1acf5f3a690f", async() => {
                 BeginContext(3114, 50, true);
                 WriteLiteral("More info <i class=\"fa fa-arrow-circle-right\"></i>");
                 EndContext();

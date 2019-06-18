@@ -21,11 +21,10 @@ namespace SmartHealth.ApiControllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<string>> GetSymptom(string Name)
+        public async Task<IEnumerable<Symptom>> GetSymptom(string Name)
         {
             return await _context.Symptoms
                     .Where(s => s.Name.Contains(Name))
-                    .Select(s => s.Name)
                     .ToListAsync();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,22 +21,22 @@ namespace SmartHealth.ApiControllers
             _context = context;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(Login login)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Patient>> GetPatient(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-            string encryptedpassword = Encrypt.EncryptString(login.Password);
-            var patient = await _context.Patients
-                .Where(u => u.Email == login.Email && u.Password == encryptedpassword)
-                .FirstOrDefaultAsync();
+            var patient = await _context.Patients.FindAsync(id);
             if (patient == null)
             {
-                return NotFound("This Patient Not Exist");
+                return NotFound("patient Not founded");
             }
             return Ok(patient);
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult DecryptPassword([FromQuery]string password)
+        {
+            var patientPassword = Encrypt.DecryptString(password);
+            return Ok(patientPassword);
         }
 
         [HttpPost]
@@ -57,6 +58,16 @@ namespace SmartHealth.ApiControllers
             await _context.Patients.AddAsync(patient);
             await _context.SaveChangesAsync();
             return Ok(patient);
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<IEnumerable<Assessment>> GetPredictionResults([FromRoute]int id)
+        {
+            var assessments = await _context.Assessments
+                                .Where(a => a.Patient.ID == id)
+                                .OrderByDescending(d => d.Date)
+                                .ToListAsync();
+            return assessments;
         }
 
         [HttpPut("{id}")]
@@ -83,6 +94,56 @@ namespace SmartHealth.ApiControllers
             return Ok(patient);
         }
 
+        [HttpPut("[action]")]
+        public async Task<IActionResult> ResetPassword(Patient item)
+        {
+            var patient = await _context.Patients
+                          .Where(u => u.Email == item.Email)
+                          .FirstOrDefaultAsync();
+            if(patient == null)
+            {
+                return NotFound("This Email Not Founded");
+            }
+            var hasedPassword = Encrypt.EncryptString(item.Password);
+            var user = await _context.Patients
+                       .Where(u => u.Password == hasedPassword)
+                       .FirstOrDefaultAsync();
+            if (user != null && user.ID != patient.ID)
+            {
+                return BadRequest("Password Already Taken");
+            }
+            patient.Password = hasedPassword;
+            _context.Patients.Update(patient);
+            await _context.SaveChangesAsync();
+            return Ok(patient);
+        }
+
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> UpdateProfile(int id, Patient item)
+        {
+            var patient = await _context.Patients.FindAsync(id);
+            if (patient == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Patients
+                     .Where(u => u.Email == item.Email)
+                     .FirstOrDefaultAsync();
+            if(user != null && user.ID != patient.ID)
+            {
+                return BadRequest("Patient Email existing");
+            }
+            patient.Name = item.Name;
+            patient.Email = item.Email;
+            patient.BirthDate = item.BirthDate;
+            patient.Height = item.Height;
+            patient.Weight = item.Weight;
+            patient.Gender = item.Gender;
+            _context.Patients.Update(patient);
+            await _context.SaveChangesAsync();
+            return Ok(patient);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePatient(int id)
         {
@@ -91,9 +152,22 @@ namespace SmartHealth.ApiControllers
             {
                 return NotFound();
             }
+            var patientAssessments = await _context.Assessments
+                                .Where(d => d.Patient.ID == patient.ID)
+                                .ToListAsync();
+            var patientRating = await _context.DoctorRatings
+                                .Where(d => d.Patient.ID == patient.ID)
+                                .ToListAsync();
+            var patientFeedback = await _context.Feedbacks
+                                    .Where(d => d.Patient.ID == patient.ID)
+                                    .ToListAsync();
+            _context.Feedbacks.RemoveRange(patientFeedback);
+            _context.Assessments.RemoveRange(patientAssessments);
+            _context.DoctorRatings.RemoveRange(patientRating);
             _context.Patients.Remove(patient);
             await _context.SaveChangesAsync();
             return Ok(patient);
         }
+
     }
 }

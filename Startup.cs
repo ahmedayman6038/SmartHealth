@@ -3,11 +3,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SmartHealth.Data;
 using SmartHealth.Helper;
+using SmartHealth.ViewModels;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 
@@ -15,6 +19,7 @@ namespace SmartHealth
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,7 +33,7 @@ namespace SmartHealth
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -80,8 +85,8 @@ namespace SmartHealth
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSession();
             app.UseCookiePolicy();
+            app.UseSession();
             app.UseAuthentication();
 
             app.UseMvc(routes =>

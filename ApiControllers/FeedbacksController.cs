@@ -56,7 +56,7 @@ namespace SmartHealth.ApiControllers
                 await _context.Feedbacks.AddAsync(feedback);
                 await _context.SaveChangesAsync();
                 _ = SendMailAsync(mail);
-                return Ok();
+                return Ok(mail);
             }
             return BadRequest();
         }
